@@ -1,0 +1,14 @@
+{
+  "instagramBaseUrl": "https://www.instagram.com",
+  "recentPostsLimit": 12,
+  "http": {
+    "timeoutMs": 20000,
+    "maxRetries": 3,
+    "retryBackoffMs": 1000
+  },
+  "rateLimit": {
+    "minDelayMs": 1200,
+    "jitterMs": 400
+  },
+  "concurrency": 5
+}
