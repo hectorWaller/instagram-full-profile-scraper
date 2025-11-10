@@ -1,0 +1,26 @@
+{
+  "name": "instagram-full-profile-scraper",
+  "version": "1.0.0",
+  "description": "Capture complete public profile insights from Instagram at scale.",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "ig-scrape": "cli/run.mjs"
+  },
+  "scripts": {
+    "start": "node cli/run.mjs --input data/inputs.sample.json --out output/profiles.jsonl",
+    "dev": "node --watch cli/run.mjs --input data/inputs.sample.json --out output/profiles.jsonl",
+    "lint": "node -e \"console.log('No linter configured')\"",
+    "test": "node -e \"console.log('No tests in this repo tree')\""
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "csv-stringify": "^6.4.6",
+    "minimist": "^1.2.8",
+    "pino": "^9.4.0",
+    "undici": "^6.19.8"
+  }
+}
