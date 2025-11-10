@@ -1,0 +1,55 @@
+parsedJson?.props?.pageProps?.graphql?.user?.edge_owner_to_timeline_media?.edges?.map((e) => e.node),
+    // Alternative shapes under pageProps.user.timeline media
+    parsedJson?.props?.pageProps?.user?.edge_owner_to_timeline_media?.edges?.map((e) => e.node),
+    // Some IG payloads keep media in a flat array
+    parsedJson?.props?.pageProps?.media
+  ].filter(Boolean);
+
+  for (const arr of candidates) {
+    for (const item of arr) {
+      pushPost(item);
+      if (posts.length >= limit) return posts.slice(0, limit);
+    }
+  }
+
+  // 2) Fallback: parse anchors from HTML
+  const $ = cheerio.load(html);
+  const anchors = $('a[href*="/p/"]').slice(0, limit);
+  anchors.each((_, el) => {
+    const href = $(el).attr('href') || '';
+    const shortcode = (href.match(/\/p\/([^/]+)\//) || [])[1] || '';
+    pushPost({
+      id: shortcode,
+      shortcode,
+      __typename: 'GraphImage',
+      caption: $(el).attr('aria-label') || ''
+    });
+  });
+
+  return posts.slice(0, limit);
+}
+
+function resolveType(t) {
+  if (!t) return 'IMAGE';
+  if (typeof t === 'number') {
+    // IG media_type: 1 image, 2 video, 8 carousel
+    return t === 2 ? 'VIDEO' : t === 8 ? 'CAROUSEL' : 'IMAGE';
+  }
+  if (/video/i.test(t)) return 'VIDEO';
+  if (/sidecar|carousel/i.test(t)) return 'CAROUSEL';
+  return 'IMAGE';
+}
+function truncate(s, n) {
+  if (!s) return '';
+  return s.length > n ? s.slice(0, n - 1) + '…' : s;
+}
+function isoFromEpoch(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return null;
+  const ms = n < 1e12 ? n * 1000 : n;
+  return new Date(ms).toISOString();
+}
+function toInt(v) {
+  const n = Number(String(v ?? '').toString().replace(/[^\d]/g, ''));
+  return Number.isFinite(n) ? n : null;
+}
